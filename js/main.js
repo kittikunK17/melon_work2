@@ -160,20 +160,22 @@
     });
   }
 
-  /* video preview: tap to play / pause (only one plays at a time) */
+  /* phones: tiles are small, so photos and videos open in a big viewer instead */
+  var small = function () { return window.innerWidth <= 860; };
+
+  /* video preview: tap to play / pause inline (computers); on phones it opens in the viewer */
   galGrid.addEventListener('click', function (e) {
     var w = e.target.closest('.gal-vid'); if (!w) return;
     var v = w.querySelector('video');
+    if (small()) {
+      v.pause();
+      var f = w.closest('.gal-item');
+      openLb('video', v.getAttribute('src'), v.getAttribute('aria-label') || '', f.querySelector('figcaption').textContent, v.getAttribute('poster'), w.querySelector('.gal-play'));
+      return;
+    }
     if (v.paused) {
       galGrid.querySelectorAll('video').forEach(function (o) { if (o !== v) o.pause(); });
       var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
-      /* phones: the tile is small, so open the video full screen */
-      if (window.innerWidth <= 600) {
-        try {
-          if (v.requestFullscreen) v.requestFullscreen().catch(function () {});
-          else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
-        } catch (err) {}
-      }
     } else v.pause();
   });
   ['play', 'pause', 'ended'].forEach(function (ev) {
@@ -185,33 +187,48 @@
     }, true);
   });
 
-  /* leaving full screen on a phone stops the video */
-  document.addEventListener('fullscreenchange', function () {
-    var fs = document.fullscreenElement;
-    galGrid.querySelectorAll('video').forEach(function (v) {
-      v.controls = v === fs;                       /* normal player buttons only while full screen */
-      if (!fs && window.innerWidth <= 600) v.pause();
-    });
-  });
-  galGrid.addEventListener('webkitendfullscreen', function (e) { e.target.pause(); }, true);
-
-  /* photo lightbox */
-  var lb = $('lightbox'), lbOpener = null;
-  galGrid.addEventListener('click', function (e) {
-    var b = e.target.closest('.gal-open'); if (!b) return;
-    var img = b.querySelector('img'), f = b.closest('.gal-item');
-    lbOpener = b;
-    $('lbImg').src = img.src; $('lbImg').alt = img.alt;
-    var cap = f.querySelector('figcaption').textContent;
-    $('lbCap').textContent = cap; $('lbCap').hidden = !cap;
+  /* viewer (photos + videos). Closes with the big X, a tap on the dark area, Esc, or the phone's Back button/gesture */
+  var lb = $('lightbox'), lbImg = $('lbImg'), lbVid = $('lbVid'), lbOpener = null, lbPushed = false;
+  function openLb(kind, src, alt, cap, poster, opener) {
+    lbOpener = opener;
+    lb.classList.toggle('is-video', kind === 'video');
+    if (kind === 'video') {
+      lbImg.removeAttribute('src'); lbImg.hidden = true;
+      lbVid.hidden = false;
+      if (poster) lbVid.setAttribute('poster', poster); else lbVid.removeAttribute('poster');
+      lbVid.src = src; lbVid.setAttribute('aria-label', alt);
+    } else {
+      lbVid.pause(); lbVid.removeAttribute('src'); lbVid.hidden = true;
+      lbImg.hidden = false; lbImg.src = src; lbImg.alt = alt;
+    }
+    $('lbCap').textContent = cap || ''; $('lbCap').hidden = !cap;
     $('lbClose').setAttribute('aria-label', T('close'));
     if (lb.showModal) lb.showModal(); else lb.setAttribute('open', '');
     document.body.style.overflow = 'hidden';
+    if (kind === 'video') { var pr = lbVid.play(); if (pr && pr.catch) pr.catch(function () {}); }
+    /* an extra history step, so the phone's Back closes the viewer instead of leaving the site */
+    if (!lbPushed) { try { history.pushState({ tawanLb: 1 }, ''); lbPushed = true; } catch (err) {} }
+  }
+  function stopLbVideo() { lbVid.pause(); if (lbVid.hasAttribute('src')) { lbVid.removeAttribute('src'); try { lbVid.load(); } catch (err) {} } }
+  function closeLb() {
+    stopLbVideo();
+    if (lb.close) { if (lb.open) lb.close(); } else { lb.removeAttribute('open'); lb.dispatchEvent(new Event('close')); }
+  }
+  lb.addEventListener('close', function () {
+    stopLbVideo();
+    document.body.style.overflow = '';
+    if (lbOpener && document.contains(lbOpener)) lbOpener.focus({ preventScroll: true });
+    if (lbPushed) { lbPushed = false; if (history.state && history.state.tawanLb) history.back(); }
   });
-  function closeLb() { if (lb.close) lb.close(); else lb.removeAttribute('open'); document.body.style.overflow = ''; }
+  window.addEventListener('popstate', function () { if (lbPushed) { lbPushed = false; closeLb(); } });
   $('lbClose').addEventListener('click', closeLb);
-  lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
-  lb.addEventListener('close', function () { document.body.style.overflow = ''; if (lbOpener && document.contains(lbOpener)) lbOpener.focus(); });
+  lb.addEventListener('click', function (e) { if (e.target === lb || e.target.classList.contains('lb-stage')) closeLb(); });
+
+  galGrid.addEventListener('click', function (e) {
+    var b = e.target.closest('.gal-open'); if (!b) return;
+    var img = b.querySelector('img'), f = b.closest('.gal-item');
+    openLb('photo', img.src, img.alt, f.querySelector('figcaption').textContent, '', b);
+  });
 
   /* ---------- marquee (two rows) ---------- */
   function renderMarquee() {

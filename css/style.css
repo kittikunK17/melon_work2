@@ -325,12 +325,17 @@ html.lenis,html.lenis body{height:auto}
 .gal-vid.playing:hover .gal-play,.gal-vid.playing .gal-play:focus-visible{opacity:.85}
 @media (max-width:600px){.gal-item.gal-video.tall{grid-column:auto}.gal-play{width:56px;height:56px;margin:-28px 0 0 -28px}
 .gal-grid{grid-template-columns:1fr 1fr;gap:10px}.gal-item>button{border-radius:16px}.gal-video{grid-column:1/-1}.gal-item figcaption{font-size:14px}}
-.lightbox{border:0;padding:0;background:transparent;max-width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:visible}
-.lightbox::backdrop{background:rgba(20,12,6,.88)}
-.lightbox img{display:block;max-width:100%;max-height:calc(100vh - 120px);border-radius:18px;margin:0 auto}
-.lb-cap{color:#FBEBD6;text-align:center;margin:10px 0 0;font-size:16px}
-.lightbox .close{position:absolute;top:-14px;right:-14px;z-index:2}
-@media (max-width:600px){.lightbox .close{top:8px;right:8px}}
+.lightbox{border:0;padding:0;margin:0;background:transparent;width:100%;height:100%;max-width:none;max-height:none;overflow:hidden}
+.lightbox[open]{display:block}
+.lightbox::backdrop{background:rgba(20,12,6,.92)}
+.lb-stage{box-sizing:border-box;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:max(72px,env(safe-area-inset-top,0px)) 16px max(24px,env(safe-area-inset-bottom,0px))}
+.lightbox img,.lightbox video{display:block;max-width:min(1100px,100%);max-height:calc(100% - 40px);min-height:0;border-radius:18px;object-fit:contain}
+.lightbox video{background:#000;aspect-ratio:auto;height:auto;width:auto}
+.lightbox [hidden]{display:none!important}
+.lb-cap{color:#FBEBD6;text-align:center;margin:0;font-size:16px;flex:none}
+/* big, easy-to-hit close button pinned to the top corner */
+.lightbox .close{position:fixed;top:max(14px,env(safe-area-inset-top,0px));right:max(14px,env(safe-area-inset-right,0px));z-index:3;width:54px;height:54px;background:#FFFDF9;color:#3A2312;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+.lightbox .close:active{transform:scale(.92)}
 
 /* ================= phone touch polish =================
    no blue tap box, no accidental text/image selection on repeated taps, no double-tap zoom delay */
@@ -339,7 +344,6 @@ a,button,summary,.panel,.gal-vid,.gal-open{touch-action:manipulation}
 button,.btn,.panel,.gal-item,.gal-vid,.cut-item,.callbar,.marquee,.hero-art,.lang,.menu-btn{-webkit-user-select:none;user-select:none}
 img,video,svg{-webkit-touch-callout:none}
 .gal-vid video{pointer-events:none}      /* taps go to the play/pause tile, not the bare video */
-.gal-vid video:fullscreen{pointer-events:auto}
 .gal-play:active{transform:scale(.92)}
 .gal-open:active img{transform:scale(1.02)}
 .btn:active,.pill-call:active,.callbar:active{transform:scale(.97)}
