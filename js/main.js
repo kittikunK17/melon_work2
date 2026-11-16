@@ -326,16 +326,21 @@
     if (!reduce && window.innerWidth <= 860) {
       /* phones: no pinning — the melon opens and the points light up as the section scrolls past */
       cut.classList.add('live');
-      var vh = window.innerHeight, rc = cut.getBoundingClientRect();
-      var pp = Math.min(1, Math.max(0, (vh * 0.75 - rc.top) / (rc.height * 0.85)));
+      var vh = window.innerHeight, rc = cut.querySelector('.cut-art').getBoundingClientRect();
+      /* starts opening as soon as the melon peeks in, fully open by the time it reaches the middle of the screen */
+      var pp = Math.min(1, Math.max(0, (vh * 0.95 - rc.top) / (vh * 0.55)));
       setCut(pp * (window.innerWidth <= 600 ? 0.45 : 0.7));
-      var onM = pp < 0.4 ? 0 : pp < 0.7 ? 1 : 2;
-      if (onM !== lastOn) { lastOn = onM; items.forEach(function (it, i) { it.classList.toggle('on', i === onM); }); }
+      /* light up the point that's closest to the middle of the screen */
+      var onM = 0, best = Infinity;
+      items.forEach(function (it, i) { var r = it.getBoundingClientRect(), d = Math.abs(r.top + r.height / 2 - vh * 0.55); if (d < best) { best = d; onM = i; } });
+      lastOn = onM; items.forEach(function (it, i) { it.classList.toggle('on', i === onM); });   /* overrides the highlight setCut picked */
     }
     else if (staticCut()) { cut.classList.remove('live'); setCut(window.innerWidth <= 600 ? 0.45 : 0.7); if (lastOn !== -2) { lastOn = -2; items.forEach(function (it) { it.classList.remove('on'); }); } }
     else {
-      var rect = cut.getBoundingClientRect();
-      var p = Math.min(1, Math.max(0, -rect.top / (rect.height - window.innerHeight)));
+      /* starts opening while the section scrolls in (not only once it's pinned), and finishes with a short hold before the section leaves */
+      var rect = cut.getBoundingClientRect(), wh = window.innerHeight;
+      var from = wh * 0.6, to = -(rect.height - wh) * 0.8;
+      var p = Math.min(1, Math.max(0, (from - rect.top) / (from - to)));
       setCut(p);
     }
     if (!reduce && farm.firstElementChild) {
