@@ -124,7 +124,7 @@
     } else {
       body = '<button class="gal-open" type="button"><img src="' + esc(g.src) + '" alt="" decoding="async"></button>';
     }
-    return '<figure class="gal-item ' + (g.type === 'youtube' ? 'gal-video' : g.type === 'video' ? 'gal-video wait' : 'gal-photo wait') + '" data-i="' + i + '">' + body + '<figcaption></figcaption></figure>';
+    return '<figure class="gal-item ' + (g.type === 'youtube' ? 'gal-video' : g.type === 'video' ? 'gal-video tall' : 'gal-photo wait') + '" data-i="' + i + '">' + body + '<figcaption></figcaption></figure>';
   }).join('');
   /* items show once their file loads; a file that isn't there yet just stays out of the grid */
   function galReady(e) {
@@ -137,7 +137,11 @@
     }
   }
   galGrid.addEventListener('load', galReady, true);
-  galGrid.addEventListener('loadedmetadata', galReady, true);
+  /* videos show straight away (iPhones don't preload them); fix the shape once the size is known */
+  galGrid.addEventListener('loadedmetadata', function (e) {
+    var v = e.target, f = v.closest('.gal-item');
+    if (f && v.videoWidth) f.classList.toggle('tall', v.videoHeight > v.videoWidth * 1.1);
+  }, true);
   galGrid.addEventListener('error', function (e) {
     var t = e.target;
     if (t.tagName === 'IMG' || t.tagName === 'VIDEO') {
@@ -162,7 +166,14 @@
     var v = w.querySelector('video');
     if (v.paused) {
       galGrid.querySelectorAll('video').forEach(function (o) { if (o !== v) o.pause(); });
-      v.play();
+      var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+      /* phones: the tile is small, so open the video full screen */
+      if (window.innerWidth <= 600) {
+        try {
+          if (v.requestFullscreen) v.requestFullscreen().catch(function () {});
+          else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+        } catch (err) {}
+      }
     } else v.pause();
   });
   ['play', 'pause', 'ended'].forEach(function (ev) {
@@ -173,6 +184,12 @@
       w.querySelector('.gal-play').setAttribute('aria-label', on ? (lang === 'th' ? 'หยุดวิดีโอ' : 'Pause video') : (lang === 'th' ? 'เล่นวิดีโอ' : 'Play video'));
     }, true);
   });
+
+  /* leaving full screen on a phone stops the video */
+  document.addEventListener('fullscreenchange', function () {
+    if (!document.fullscreenElement && window.innerWidth <= 600) galGrid.querySelectorAll('video').forEach(function (v) { v.pause(); });
+  });
+  galGrid.addEventListener('webkitendfullscreen', function (e) { e.target.pause(); }, true);
 
   /* photo lightbox */
   var lb = $('lightbox'), lbOpener = null;
