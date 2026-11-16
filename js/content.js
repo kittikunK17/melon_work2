@@ -11,8 +11,8 @@
 window.SITE = {
 
   /* ---------- ข้อมูลติดต่อ ---------- */
-  phone: '083-125-9904',          // เบอร์ที่แสดงบนเว็บ
-  phoneDial: '0831259904',        // เบอร์สำหรับกดโทร (ตัวเลขล้วน)
+  phone: '089-456-7123',          // เบอร์ที่แสดงบนเว็บ
+  phoneDial: '0894567123',        // เบอร์สำหรับกดโทร (ตัวเลขล้วน)
   mapLink: 'https://maps.app.goo.gl/BSAGVaqG4gFMrHDj9',
   mapEmbed: true,                 // true = แสดงแผนที่ Google Maps ในหน้าเว็บ
   address: {
@@ -95,7 +95,7 @@ window.SITE = {
       farm_alt: 'บรรยากาศในสวนเมลอนตะวันฟาร์ม หนองคาย',
       melon_alt: 'เมลอนพันธุ์',
       // ข้อความวิ่งใต้ภาพหลัก (เพิ่ม/ลด/แก้ได้)
-      marquee: ['เมลอนหนองคาย', 'ปลูกเองทุกลูก', 'สดจากสวนทุกวัน', 'มาเที่ยวชมสวนได้', 'โทรสั่ง 083-125-9904'],
+      marquee: ['เมลอนหนองคาย', 'ปลูกเองทุกลูก', 'สดจากสวนทุกวัน', 'มาเที่ยวชมสวนได้', 'โทรสั่ง 089-456-7123'],
       cut_title: 'จากสวนของเรา ถึงมือคุณ',
       steps_title: 'มาเที่ยวสวนง่ายๆ 3 ขั้นตอน',
       step1_t: 'โทรนัดล่วงหน้า', step1_d: 'บอกวันและจำนวนคน เราจะเตรียมเมลอนให้ชิม',
@@ -131,7 +131,7 @@ window.SITE = {
       footer: 'Nong Khai melons, grown by us',
       farm_alt: 'Tawan Farm melon garden in Nong Khai',
       melon_alt: 'Melon variety',
-      marquee: ['Nong Khai melons', 'Grown by us', 'Fresh from the farm', 'Farm visits welcome', 'Call 083-125-9904'],
+      marquee: ['Nong Khai melons', 'Grown by us', 'Fresh from the farm', 'Farm visits welcome', 'Call 089-456-7123'],
       cut_title: 'From our farm to your hands',
       steps_title: 'Visit the farm in 3 easy steps',
       step1_t: 'Call ahead', step1_d: 'Tell us the day and group size, and we will prepare melons to taste',
