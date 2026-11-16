@@ -34,7 +34,7 @@ window.SITE = {
      - วิดีโอยาว/ใหญ่เกิน 50 MB ให้อัปขึ้น YouTube แล้วใช้แบบ youtube แทน
   */
   gallery: [
-    { type: 'video', src: 'videos/video-1.mp4', poster: '', th: '', en: '' },
+    { type: 'video', src: 'videos/for_commer.mp4', poster: '', th: 'เดินชมโรงเรือนเมลอนของเรา', en: 'A walk through our melon greenhouse' },
     { type: 'photo', src: 'images/gallery/photo-1.jpg', th: 'เมลอนเหลืองบนต้น ในโรงเรือนของเรา', en: 'Yellow melons ripening on the vine' },
     { type: 'photo', src: 'images/gallery/photo-2.jpg', th: 'ลูกนี้ใกล้เก็บแล้ว', en: 'Almost ready to pick' },
     { type: 'photo', src: 'images/gallery/photo-3.jpg', th: 'ป้ายหน้าบ้านตะวันรีสอร์ท และบ้านสวนตะวันฟาร์ม', en: 'Our sign at Baan Tawan Resort & Tawan Farm' }
