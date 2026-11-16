@@ -116,18 +116,22 @@
   galGrid.innerHTML = gal.map(function (g, i) {
     var body;
     if (g.type === 'video') {
-      body = '<video controls playsinline preload="metadata" src="' + esc(g.src) + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>';
+      body = '<video controls playsinline preload="metadata" src="' + esc(g.src) + (g.poster ? '' : '#t=0.1') + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>';
     } else if (g.type === 'youtube') {
       body = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(g.id) + '" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
     } else {
-      body = '<button class="gal-open" type="button"><img src="' + esc(g.src) + '" alt="" loading="lazy" decoding="async"></button>';
+      body = '<button class="gal-open" type="button"><img src="' + esc(g.src) + '" alt="" decoding="async"></button>';
     }
     return '<figure class="gal-item ' + (g.type === 'youtube' ? 'gal-video' : g.type === 'video' ? 'gal-video wait' : 'gal-photo wait') + '" data-i="' + i + '">' + body + '<figcaption></figcaption></figure>';
   }).join('');
   /* items show once their file loads; a file that isn't there yet just stays out of the grid */
   function galReady(e) {
     var f = e.target.closest && e.target.closest('.gal-item');
-    if (f && f.classList.contains('wait')) { f.classList.remove('wait'); galCheck(); }
+    if (f && f.classList.contains('wait')) {
+      var t = e.target, w = t.videoWidth || t.naturalWidth, h = t.videoHeight || t.naturalHeight;
+      if (h > w * 1.1) f.classList.add('tall');   /* phone-shot (vertical) photo or video */
+      f.classList.remove('wait'); galCheck();
+    }
   }
   galGrid.addEventListener('load', galReady, true);
   galGrid.addEventListener('loadedmetadata', galReady, true);
