@@ -116,7 +116,9 @@
   galGrid.innerHTML = gal.map(function (g, i) {
     var body;
     if (g.type === 'video') {
-      body = '<video controls playsinline preload="metadata" src="' + esc(g.src) + (g.poster ? '' : '#t=0.1') + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>';
+      /* still preview + play button; tap to play, tap again to pause */
+      body = '<div class="gal-vid"><video playsinline preload="metadata" src="' + esc(g.src) + (g.poster ? '' : '#t=0.1') + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>' +
+        '<button class="gal-play" type="button"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5.5v13l11-6.5z" fill="currentColor"/><g class="i-pause" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></g></svg></button></div>';
     } else if (g.type === 'youtube') {
       body = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(g.id) + '" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
     } else {
@@ -126,7 +128,8 @@
   }).join('');
   /* items show once their file loads; a file that isn't there yet just stays out of the grid */
   function galReady(e) {
-    var f = e.target.closest && e.target.closest('.gal-item');
+    if (e.target.tagName !== 'IMG' && e.target.tagName !== 'VIDEO') return;   /* ignore svg icon load events */
+    var f = e.target.closest('.gal-item');
     if (f && f.classList.contains('wait')) {
       var t = e.target, w = t.videoWidth || t.naturalWidth, h = t.videoHeight || t.naturalHeight;
       if (h > w * 1.1) f.classList.add('tall');   /* phone-shot (vertical) photo or video */
@@ -148,9 +151,28 @@
       var label = cap || T(g.type === 'photo' || !g.type ? 'gallery_alt' : 'gallery_video');
       var img = f.querySelector('img'); if (img) img.alt = label;
       var v = f.querySelector('video, iframe'); if (v) { v.setAttribute('aria-label', label); v.title = label; }
+      var pb = f.querySelector('.gal-play'); if (pb) pb.setAttribute('aria-label', (f.querySelector('.playing') ? (lang === 'th' ? 'หยุดวิดีโอ' : 'Pause video') : (lang === 'th' ? 'เล่นวิดีโอ' : 'Play video')) + ': ' + label);
       var fc = f.querySelector('figcaption'); fc.textContent = cap; fc.hidden = !cap;
     });
   }
+
+  /* video preview: tap to play / pause (only one plays at a time) */
+  galGrid.addEventListener('click', function (e) {
+    var w = e.target.closest('.gal-vid'); if (!w) return;
+    var v = w.querySelector('video');
+    if (v.paused) {
+      galGrid.querySelectorAll('video').forEach(function (o) { if (o !== v) o.pause(); });
+      v.play();
+    } else v.pause();
+  });
+  ['play', 'pause', 'ended'].forEach(function (ev) {
+    galGrid.addEventListener(ev, function (e) {
+      var w = e.target.closest('.gal-vid'); if (!w) return;
+      var on = !e.target.paused && !e.target.ended;
+      w.classList.toggle('playing', on);
+      w.querySelector('.gal-play').setAttribute('aria-label', on ? (lang === 'th' ? 'หยุดวิดีโอ' : 'Pause video') : (lang === 'th' ? 'เล่นวิดีโอ' : 'Play video'));
+    }, true);
+  });
 
   /* photo lightbox */
   var lb = $('lightbox'), lbOpener = null;
