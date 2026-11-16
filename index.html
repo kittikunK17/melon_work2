@@ -41,12 +41,9 @@
   "hasMap": "https://maps.app.goo.gl/BSAGVaqG4gFMrHDj9"
 }
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
-<script src="js/content.js?v=202611162154" defer></script>
-<script src="js/main.js?v=202611162154" defer></script>
-<script src="js/motion.js?v=202611162154" defer></script>
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
+<link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js">
+<link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js">
 </head>
 <body>
 <a class="skip" href="#main" data-i18n="skip">ข้ามไปเนื้อหา</a>
@@ -278,5 +275,25 @@
     </div>
   </div>
 </dialog>
+
+<!-- Scripts load in order. js/content.js gets a fresh copy on every visit, so edits made on GitHub show up straight away.
+     main.js / motion.js use ?v= (change the number whenever those files change). -->
+<script>
+(function () {
+  var v = '202611162154';
+  [
+    'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js',
+    'https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js',
+    'js/content.js?t=' + Date.now(),
+    'js/main.js?v=' + v,
+    'js/motion.js?v=' + v
+  ].forEach(function (src) {
+    var s = document.createElement('script');
+    s.src = src; s.async = false;   /* keep this order */
+    document.body.appendChild(s);
+  });
+})();
+</script>
 </body>
 </html>
