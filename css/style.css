@@ -331,3 +331,16 @@ html.lenis,html.lenis body{height:auto}
 .lb-cap{color:#FBEBD6;text-align:center;margin:10px 0 0;font-size:16px}
 .lightbox .close{position:absolute;top:-14px;right:-14px;z-index:2}
 @media (max-width:600px){.lightbox .close{top:8px;right:8px}}
+
+/* ================= phone touch polish =================
+   no blue tap box, no accidental text/image selection on repeated taps, no double-tap zoom delay */
+html{-webkit-tap-highlight-color:transparent}
+a,button,summary,.panel,.gal-vid,.gal-open{touch-action:manipulation}
+button,.btn,.panel,.gal-item,.gal-vid,.cut-item,.callbar,.marquee,.hero-art,.lang,.menu-btn{-webkit-user-select:none;user-select:none}
+img,video,svg{-webkit-touch-callout:none}
+.gal-vid video{pointer-events:none}      /* taps go to the play/pause tile, not the bare video */
+.gal-vid video:fullscreen{pointer-events:auto}
+.gal-play:active{transform:scale(.92)}
+.gal-open:active img{transform:scale(1.02)}
+.btn:active,.pill-call:active,.callbar:active{transform:scale(.97)}
+:focus:not(:focus-visible){outline:none}

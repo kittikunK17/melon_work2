@@ -187,7 +187,11 @@
 
   /* leaving full screen on a phone stops the video */
   document.addEventListener('fullscreenchange', function () {
-    if (!document.fullscreenElement && window.innerWidth <= 600) galGrid.querySelectorAll('video').forEach(function (v) { v.pause(); });
+    var fs = document.fullscreenElement;
+    galGrid.querySelectorAll('video').forEach(function (v) {
+      v.controls = v === fs;                       /* normal player buttons only while full screen */
+      if (!fs && window.innerWidth <= 600) v.pause();
+    });
   });
   galGrid.addEventListener('webkitendfullscreen', function (e) { e.target.pause(); }, true);
 
