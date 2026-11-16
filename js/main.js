@@ -226,7 +226,7 @@
     lastY = y;
     if (y < 200) { nav.querySelectorAll('a').forEach(function (a) { a.setAttribute('aria-current', 'false'); }); moveInd(); }
 
-    if (staticCut()) { setCut(0.7); if (lastOn !== -2) { lastOn = -2; items.forEach(function (it) { it.classList.remove('on'); }); } }
+    if (staticCut()) { setCut(window.innerWidth <= 600 ? 0.45 : 0.7); if (lastOn !== -2) { lastOn = -2; items.forEach(function (it) { it.classList.remove('on'); }); } }
     else {
       var rect = cut.getBoundingClientRect();
       var p = Math.min(1, Math.max(0, -rect.top / (rect.height - window.innerHeight)));
