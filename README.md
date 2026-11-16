@@ -17,7 +17,9 @@ tawan-farm-site/
 │   ├── favicon.svg     ← ไอคอนบนแท็บเบราว์เซอร์
 │   ├── share.jpg       ← (ใส่เพิ่มเอง) รูปตอนแชร์ลิงก์ใน LINE/Facebook
 │   ├── melons/         ← รูปเมลอนแต่ละพันธุ์ melon-1.jpg ถึง melon-5.jpg
-│   └── farm/           ← รูปบรรยากาศสวน farm-1.jpg
+│   ├── farm/           ← รูปบรรยากาศสวน farm-1.jpg
+│   └── gallery/        ← รูปในส่วน "รูปและวิดีโอ" photo-1.jpg, photo-2.jpg ...
+├── videos/             ← วิดีโอ video-1.mp4, video-2.mp4 ...
 └── robots.txt
 ```
 
@@ -41,6 +43,26 @@ tawan-farm-site/
 
 **รูปแชร์ลิงก์:** ทำรูปขนาด 1200 x 630 ชื่อ `share.jpg` วางใน `images/`
 (ทำใน Canva ได้ เลือกขนาด "Facebook Post (Landscape)")
+
+
+### ใส่รูปและวิดีโอเพิ่ม (ส่วน "รูปและวิดีโอจากสวน")
+
+1. รูป → วางใน `images/gallery/` ชื่อ `photo-1.jpg`, `photo-2.jpg`, ...
+2. วิดีโอ → วางใน `videos/` ชื่อ `video-1.mp4`, `video-2.mp4`, ... (ไม่เกิน 20 MB ต่อไฟล์)
+   รูปหน้าปกวิดีโอ (ไม่บังคับ) → `images/gallery/video-1.jpg`
+3. เปิด `js/content.js` หา `gallery: [` แล้วเพิ่ม/ลบบรรทัดให้ตรงกับไฟล์ที่มี ใส่คำบรรยายได้ที่ `th:` / `en:`
+4. วิดีโอยาวหรือไฟล์ใหญ่ → อัปขึ้น YouTube แล้วใส่ `{ type: 'youtube', id: 'รหัสวิดีโอ', th: '', en: '' }`
+
+ไฟล์ไหนยังไม่มี เว็บจะซ่อนช่องนั้นเอง ถ้ายังไม่มีเลยสักไฟล์ ส่วนนี้ (และเมนู) จะถูกซ่อนทั้งหมด
+
+### อัปขึ้น GitHub หลังเพิ่มรูป/วิดีโอ
+
+```
+git add .
+git commit -m "เพิ่มรูปและวิดีโอ"
+git push
+```
+หรือลากไฟล์ไปวางในหน้า GitHub ของ repo (Add file → Upload files) ในโฟลเดอร์ที่ถูกต้อง
 
 ---
 

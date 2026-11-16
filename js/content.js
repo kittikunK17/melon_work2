@@ -23,6 +23,27 @@ window.SITE = {
   /* ---------- รูปบรรยากาศสวน (ส่วน "มาเที่ยวสวน") ---------- */
   farmPhoto: 'images/farm/farm-1.jpg',
 
+  /* ---------- รูปและวิดีโอ (ส่วน "รูปและวิดีโอจากสวน") ----------
+     ใส่ไฟล์รูปใน images/gallery/  และไฟล์วิดีโอใน videos/
+     แล้วเพิ่ม/ลบบรรทัดด้านล่างให้ตรงกับไฟล์ที่มี (เรียงตามลำดับที่อยากให้แสดง)
+       รูป:      { type: 'photo', src: 'images/gallery/photo-1.jpg', th: 'คำบรรยาย', en: 'Caption' },
+       วิดีโอ:    { type: 'video', src: 'videos/video-1.mp4', poster: 'images/gallery/video-1.jpg', th: '', en: '' },
+       YouTube:  { type: 'youtube', id: 'dQw4w9WgXcQ', th: '', en: '' },   ← id คือรหัสท้ายลิงก์ youtu.be/xxxx
+     - ไฟล์ไหนยังไม่มี เว็บจะซ่อนช่องนั้นให้เอง  ถ้าไม่มีเลยทั้งหมด ส่วนนี้จะถูกซ่อน
+     - poster = รูปหน้าปกวิดีโอ (ไม่ใส่ก็ได้ ปล่อย '')
+     - วิดีโอยาว/ใหญ่เกิน 50 MB ให้อัปขึ้น YouTube แล้วใช้แบบ youtube แทน
+  */
+  gallery: [
+    { type: 'photo', src: 'images/gallery/photo-1.jpg', th: '', en: '' },
+    { type: 'photo', src: 'images/gallery/photo-2.jpg', th: '', en: '' },
+    { type: 'photo', src: 'images/gallery/photo-3.jpg', th: '', en: '' },
+    { type: 'photo', src: 'images/gallery/photo-4.jpg', th: '', en: '' },
+    { type: 'photo', src: 'images/gallery/photo-5.jpg', th: '', en: '' },
+    { type: 'photo', src: 'images/gallery/photo-6.jpg', th: '', en: '' },
+    { type: 'video', src: 'videos/video-1.mp4', poster: 'images/gallery/video-1.jpg', th: '', en: '' },
+    { type: 'video', src: 'videos/video-2.mp4', poster: 'images/gallery/video-2.jpg', th: '', en: '' }
+  ],
+
   /* ---------- เมลอนแต่ละพันธุ์ ----------
      เพิ่ม/ลดพันธุ์ได้: ก๊อปปี้ตั้งแต่ { ถึง }, ทั้งก้อน แล้ววางต่อท้าย
      ตัวอย่างการกรอก (ภาษาไทย):
@@ -68,7 +89,7 @@ window.SITE = {
   text: {
     th: {
       skip: 'ข้ามไปเนื้อหา',
-      nav_varieties: 'สายพันธุ์', nav_visit: 'ชมสวน', nav_contact: 'ติดต่อเรา', menu: 'เมนู',
+      nav_varieties: 'สายพันธุ์', nav_visit: 'ชมสวน', nav_gallery: 'รูปและวิดีโอ', nav_contact: 'ติดต่อเรา', menu: 'เมนู',
       hero_eyebrow: 'เมลอนหนองคาย จากบ้านตะวันรีสอร์ท',
       hero_title1: 'หวาน หอม', hero_title2: 'สดจากสวนหนองคาย',
       hero_lead: 'เมลอนที่เราปลูกเองทุกลูกที่ตะวันฟาร์ม อยากชิม อยากสั่ง หรืออยากมาเที่ยวสวน โทรคุยกับเราได้เลย',
@@ -101,11 +122,12 @@ window.SITE = {
       step1_t: 'โทรนัดล่วงหน้า', step1_d: 'บอกวันและจำนวนคน เราจะเตรียมเมลอนให้ชิม',
       step2_t: 'มาที่บ้านตะวันรีสอร์ท', step2_d: 'อยู่ในตัวเมืองหนองคาย ดูทางได้จากแผนที่ด้านล่าง',
       step3_t: 'เดินชมสวน ชิมสดจากต้น', step3_d: 'ถูกใจพันธุ์ไหน ซื้อกลับบ้านได้เลย',
-      details_hint: 'แตะเพื่อดูพันธุ์นี้'
+      details_hint: 'แตะเพื่อดูพันธุ์นี้',
+      gallery_title: 'รูปและวิดีโอจากสวน', gallery_hint: 'แตะรูปเพื่อดูภาพใหญ่', gallery_alt: 'ภาพจากสวนตะวันฟาร์ม', gallery_video: 'วิดีโอจากสวนตะวันฟาร์ม'
     },
     en: {
       skip: 'Skip to content',
-      nav_varieties: 'Varieties', nav_visit: 'Visit', nav_contact: 'Contact', menu: 'Menu',
+      nav_varieties: 'Varieties', nav_visit: 'Visit', nav_gallery: 'Gallery', nav_contact: 'Contact', menu: 'Menu',
       hero_eyebrow: 'Nong Khai melons from Baan Tawan Resort',
       hero_title1: 'Sweet, fragrant,', hero_title2: 'fresh from our farm',
       hero_lead: 'We grow every melon ourselves at Tawan Farm in Nong Khai. Want to taste, order, or visit the farm? Give us a call.',
@@ -137,7 +159,8 @@ window.SITE = {
       step1_t: 'Call ahead', step1_d: 'Tell us the day and group size, and we will prepare melons to taste',
       step2_t: 'Come to Baan Tawan Resort', step2_d: 'In Nong Khai town. Directions are on the map below',
       step3_t: 'Walk the farm and taste', step3_d: 'Found a favourite? Take some home',
-      details_hint: 'Tap to see this melon'
+      details_hint: 'Tap to see this melon',
+      gallery_title: 'Photos & videos from the farm', gallery_hint: 'Tap a photo to enlarge', gallery_alt: 'Photo from Tawan Farm', gallery_video: 'Video from Tawan Farm'
     }
   }
 };

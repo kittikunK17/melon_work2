@@ -60,6 +60,7 @@
     <nav id="nav" aria-label="เมนูหลัก">
       <a href="#varieties" data-i18n="nav_varieties">สายพันธุ์</a>
       <a href="#visit" data-i18n="nav_visit">ชมสวน</a>
+      <a href="#gallery" data-i18n="nav_gallery">รูปและวิดีโอ</a>
       <a href="#contact" data-i18n="nav_contact">ติดต่อเรา</a>
       <span class="nav-ind" id="navInd" aria-hidden="true"></span>
     </nav>
@@ -199,6 +200,17 @@
   </div>
 </section>
 
+<!-- ================= GALLERY (photos + videos from js/content.js) ================= -->
+<section class="block gallery" id="gallery" aria-labelledby="galTitle" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="galTitle" data-i18n="gallery_title">รูปและวิดีโอจากสวน</h2>
+      <p class="hint" data-i18n="gallery_hint">แตะรูปเพื่อดูภาพใหญ่</p>
+    </div>
+    <div class="gal-grid" id="galGrid"></div>
+  </div>
+</section>
+
 <!-- ================= CONTACT ================= -->
 <section class="block contact" id="contact" aria-labelledby="contactTitle">
   <div class="wave" aria-hidden="true"><svg viewBox="0 0 2400 60" preserveAspectRatio="none"><path d="M0 60V30C150 6 300 6 450 30S750 54 900 30 1050 6 1200 30 1500 54 1650 30 1950 6 2100 30 2250 54 2400 30V60Z"/></svg></div>
@@ -237,6 +249,12 @@
 </footer>
 
 <a class="callbar" href="#contact"><span data-i18n="cta_order">สั่งเมลอน</span></a>
+
+<dialog class="lightbox" id="lightbox" aria-label="รูปภาพ" data-lenis-prevent>
+  <button class="close" id="lbClose" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <img id="lbImg" alt="">
+  <p class="lb-cap" id="lbCap"></p>
+</dialog>
 
 <dialog class="sheet" id="sheet" aria-labelledby="dName" data-lenis-prevent>
   <button class="close" id="dClose" type="button"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>

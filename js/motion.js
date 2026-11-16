@@ -16,9 +16,11 @@
     lenis.on('scroll', ST.update);
     gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
     gsap.ticker.lagSmoothing(0);
-    var dlg = document.getElementById('sheet');
-    if (dlg) new MutationObserver(function () { dlg.hasAttribute('open') ? lenis.stop() : lenis.start(); })
-      .observe(dlg, { attributes: true, attributeFilter: ['open'] });
+    ['sheet', 'lightbox'].forEach(function (id) {
+      var dlg = document.getElementById(id);
+      if (dlg) new MutationObserver(function () { dlg.hasAttribute('open') ? lenis.stop() : lenis.start(); })
+        .observe(dlg, { attributes: true, attributeFilter: ['open'] });
+    });
   }
 
   /* --- scroll progress bar --- */
