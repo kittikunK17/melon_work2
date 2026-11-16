@@ -117,7 +117,7 @@
     var body;
     if (g.type === 'video') {
       /* still preview + play button; tap to play, tap again to pause */
-      body = '<div class="gal-vid"><video playsinline preload="metadata" src="' + esc(g.src) + (g.poster ? '' : '#t=0.1') + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>' +
+      body = '<div class="gal-vid"><video playsinline muted preload="metadata" src="' + esc(g.src) + (g.poster ? '' : '#t=0.1') + '"' + (g.poster ? ' poster="' + esc(g.poster) + '"' : '') + '></video>' +
         '<button class="gal-play" type="button"><svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5.5v13l11-6.5z" fill="currentColor"/><g class="i-pause" fill="currentColor"><rect x="6.5" y="5" width="4" height="14" rx="1"/><rect x="13.5" y="5" width="4" height="14" rx="1"/></g></svg></button></div>';
     } else if (g.type === 'youtube') {
       body = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(g.id) + '" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>';
