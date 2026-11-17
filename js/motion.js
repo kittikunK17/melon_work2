@@ -6,11 +6,15 @@
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   var gsap = window.gsap, ST = window.ScrollTrigger;
   gsap.registerPlugin(ST);
+  /* phones: don't recalculate everything when the address bar slides in/out while scrolling */
+  ST.config({ ignoreMobileResize: true });
   var fine = window.matchMedia('(pointer: fine)').matches;
+  /* phones/tablets: their own scrolling is already smooth, and the extra per-frame work made them lag */
+  var touch = !fine || window.matchMedia('(hover: none)').matches;
 
   /* --- Lenis smooth scroll, driven by the GSAP ticker --- */
   var lenis = null;
-  if (window.Lenis) {
+  if (window.Lenis && !touch) {
     lenis = new window.Lenis({ lerp: 0.1, wheelMultiplier: 1, smoothWheel: true });
     window.__lenis = lenis;
     lenis.on('scroll', ST.update);
@@ -31,8 +35,8 @@
   /* --- blur-up reveal for headings, staggered reveals for lists --- */
   var once = { start: 'top 85%', toggleActions: 'play none none none' };
   gsap.utils.toArray('.sec-head, .cut-copy h2, #visitTitle, #contactTitle').forEach(function (el) {
-    gsap.from(el, { y: 36, opacity: 0, filter: 'blur(12px)', duration: 0.9, ease: 'power3.out', clearProps: 'all',
-      scrollTrigger: Object.assign({ trigger: el }, once) });
+    gsap.from(el, Object.assign({ y: 36, opacity: 0, duration: 0.9, ease: 'power3.out', clearProps: 'all',
+      scrollTrigger: Object.assign({ trigger: el }, once) }, touch ? {} : { filter: 'blur(12px)' }));
   });
   function stagger(sel, trigger, vars) {
     var els = gsap.utils.toArray(sel); if (!els.length) return;

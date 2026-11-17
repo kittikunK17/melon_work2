@@ -344,47 +344,61 @@
 
   /* the scroll effect needs a normal browser window; inside previews that grow to the page height, show the opened melon instead */
   var staticCut = function () { return reduce || window.innerWidth <= 860 || window.innerHeight >= 1300; };
-  var lastOn = -1;
-  function setCut(p) {
+  var lastOn = -1, lastP = -1, cutArt = cut.querySelector('.cut-art'), navReset = false, lastFarm = '';
+  function setCut(p, noHi) {
+    if (p === lastP) return;   /* nothing changed: skip the style writes */
+    lastP = p;
     var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
     halfL.style.transform = 'translateX(' + (-e * 70) + 'px) rotate(' + (-e * 16) + 'deg)';
     halfR.style.transform = 'translateX(' + (e * 70) + 'px) rotate(' + (e * 16) + 'deg)';
     face.style.transform = 'scale(' + (0.6 + e * 0.42) + ')';
     bar.style.width = (p * 100) + '%';
     var on = p < 0.34 ? 0 : p < 0.67 ? 1 : 2;
-    if (on !== lastOn) { lastOn = on; items.forEach(function (it, i) { it.classList.toggle('on', i === on); }); }
+    if (!noHi && on !== lastOn) { lastOn = on; items.forEach(function (it, i) { it.classList.toggle('on', i === on); }); }
   }
+  /* all layout reads happen first, then all writes, so the browser lays the page out only once per frame (big win on phones) */
   function onScroll() {
-    var y = window.scrollY;
+    var y = window.scrollY, vh = window.innerHeight, vw = window.innerWidth;
+    var phone = !reduce && vw <= 860, still = !phone && staticCut();
+    /* ---- reads ---- */
+    var rc = null, mids = null, rect = null, fr = null;
+    if (phone) {
+      rc = cutArt.getBoundingClientRect();
+      var cr = cut.getBoundingClientRect();
+      if (cr.bottom > -vh * 0.5 && cr.top < vh * 1.5) mids = [].map.call(items, function (it) { var r = it.getBoundingClientRect(); return r.top + r.height / 2; });
+    } else if (!still) rect = cut.getBoundingClientRect();
+    if (!reduce && farm.firstElementChild) { fr = farm.getBoundingClientRect(); if (fr.bottom < -vh || fr.top > vh * 2) fr = null; }
+
+    /* ---- writes ---- */
     if (y > 160 && y > lastY + 4 && !nav.classList.contains('open')) hdr.classList.add('away');
     else if (y < lastY - 4 || y <= 160) hdr.classList.remove('away');
     lastY = y;
-    if (y < 200) { nav.querySelectorAll('a').forEach(function (a) { a.setAttribute('aria-current', 'false'); }); moveInd(); }
+    if (y < 200) { if (!navReset) { navReset = true; nav.querySelectorAll('a').forEach(function (a) { a.setAttribute('aria-current', 'false'); }); moveInd(); } }
+    else navReset = false;
 
-    if (!reduce && window.innerWidth <= 860) {
+    if (phone) {
       /* phones: no pinning — the melon opens and the points light up as the section scrolls past */
-      cut.classList.add('live');
-      var vh = window.innerHeight, rc = cut.querySelector('.cut-art').getBoundingClientRect();
+      if (!cut.classList.contains('live')) cut.classList.add('live');
       /* starts opening as soon as the melon peeks in, fully open by the time it reaches the middle of the screen */
       var pp = Math.min(1, Math.max(0, (vh * 0.95 - rc.top) / (vh * 0.55)));
-      setCut(pp * (window.innerWidth <= 600 ? 0.45 : 0.7));
-      /* light up the point that's closest to the middle of the screen */
-      var onM = 0, best = Infinity;
-      items.forEach(function (it, i) { var r = it.getBoundingClientRect(), d = Math.abs(r.top + r.height / 2 - vh * 0.55); if (d < best) { best = d; onM = i; } });
-      lastOn = onM; items.forEach(function (it, i) { it.classList.toggle('on', i === onM); });   /* overrides the highlight setCut picked */
+      setCut(Math.round(pp * (vw <= 600 ? 0.45 : 0.7) * 1000) / 1000, true);
+      if (mids) {
+        /* light up the point that's closest to the middle of the screen */
+        var onM = 0, best = Infinity;
+        mids.forEach(function (m, i) { var d = Math.abs(m - vh * 0.55); if (d < best) { best = d; onM = i; } });
+        if (onM !== lastOn) { lastOn = onM; items.forEach(function (it, i) { it.classList.toggle('on', i === onM); }); }
+      }
     }
-    else if (staticCut()) { cut.classList.remove('live'); setCut(window.innerWidth <= 600 ? 0.45 : 0.7); if (lastOn !== -2) { lastOn = -2; items.forEach(function (it) { it.classList.remove('on'); }); } }
+    else if (still) { cut.classList.remove('live'); setCut(vw <= 600 ? 0.45 : 0.7); if (lastOn !== -2) { lastOn = -2; items.forEach(function (it) { it.classList.remove('on'); }); } }
     else {
       /* starts opening while the section scrolls in (not only once it's pinned), and finishes with a short hold before the section leaves */
-      var rect = cut.getBoundingClientRect(), wh = window.innerHeight;
-      var from = wh * 0.6, to = -(rect.height - wh) * 0.8;
+      var from = vh * 0.6, to = -(rect.height - vh) * 0.8;
       var p = Math.min(1, Math.max(0, (from - rect.top) / (from - to)));
       setCut(p);
     }
-    if (!reduce && farm.firstElementChild) {
-      var fr = farm.getBoundingClientRect();
-      var t = (fr.top + fr.height / 2 - window.innerHeight / 2) / window.innerHeight;
-      farm.firstElementChild.style.transform = 'translateY(' + (-7 + t * 10).toFixed(2) + '%)';
+    if (fr) {
+      var tf = 'translateY(' + (-7 + (fr.top + fr.height / 2 - vh / 2) / vh * 10).toFixed(2) + '%)';
+      if (tf !== lastFarm) { lastFarm = tf; farm.firstElementChild.style.transform = tf; }
     }
   }
   /* in-page links: one short eased scroll (about 0.6s) instead of the browser's long smooth scroll across the tall pinned section; animations pause meanwhile so it stays smooth */
