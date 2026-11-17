@@ -1,0 +1,21 @@
+# Keep private / local-only files out of the public repo
+
+# Original, uncompressed phone clips and photos (only the shrunk copies belong here)
+*.mov
+*.MOV
+*.heic
+*.HEIC
+*-original.*
+*_original.*
+
+# Local tool settings and secrets
+.claude/
+.env
+.env.*
+*.key
+*.pem
+
+# System junk
+Thumbs.db
+desktop.ini
+.DS_Store

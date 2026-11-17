@@ -45,5 +45,5 @@ The phone layout breakpoint is `max-width: 860px` (nav collapses at 820px). Synt
 ## Media conventions
 
 - Photos: ~1200px wide, ≤300 KB. Melon photos `images/melons/melon-N.jpg`, farm photo `images/farm/farm-1.jpg` (4:5), gallery `images/gallery/`.
-- Videos: the owner drops large full-HD phone clips into `videos/`. Re-encode with ffmpeg to 720p H.264, no audio, plus a `.jpg` cover in `images/gallery/`, keeping files under ~20 MB. Move the original out of the repo to `C:\Users\MSI\Downloads\`. Then update the `gallery` entry in `content.js`.
+- Videos: the owner drops large full-HD phone clips into `videos/`. Re-encode with ffmpeg to 720p H.264, no audio, plus a `.jpg` cover in `images/gallery/`, keeping files under ~20 MB. Keep the original outside the repo (never commit it; `.gitignore` blocks common originals like `.mov`/`.heic`). Then update the `gallery` entry in `content.js`.
 - When replacing media, use a new filename rather than overwriting, so cached copies don't linger.
