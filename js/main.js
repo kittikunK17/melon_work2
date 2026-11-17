@@ -439,8 +439,7 @@
         /* if something above changed height during the jump (e.g. gallery photos finished loading), land exactly on the section anyway */
         var fix = targetY(t, id);
         if (Math.abs(fix - window.scrollY) > 2) {
-          if (window.__lenis) window.__lenis.scrollTo(fix, { immediate: true, force: true });
-          else window.scrollTo({ top: fix, behavior: 'instant' });
+          window.scrollTo({ top: fix, behavior: 'instant' });
         }
       }
       onScroll();
@@ -450,11 +449,24 @@
     userEvents.forEach(function (ev) { window.addEventListener(ev, stopOnUser, { capture: true, passive: true }); });
     /* safety net: whatever happens (interrupted, a dialog stopped the scroller…), never leave the page frozen */
     guard = setTimeout(function () { finish(true); }, 2000);
-    if (window.__lenis) { window.__lenis.scrollTo(to, { duration: 1.1, force: true, onComplete: function () { finish(true); } }); return; }
-    var t0 = performance.now(), dur = 650;
+
+    /* the melon section is pinned on screen for a long stretch (that's how the scroll animation works). During a jump every
+       frame of that stretch looks the same, so skip it: you still see the section slide in and out, but it doesn't hang there */
+    var stage = cut.querySelector('.cut-stage'), skip = 0, pinStart = 0;
+    if (stage && getComputedStyle(stage).position === 'sticky') {
+      pinStart = cut.getBoundingClientRect().top + from;
+      var pinEnd = pinStart + cut.offsetHeight - stage.offsetHeight;
+      if (pinEnd > pinStart && ((from <= pinStart && to >= pinEnd) || (to <= pinStart && from >= pinEnd))) skip = pinEnd - pinStart;
+    }
+    var real = function (v) { return skip && v > pinStart ? v + skip : v; };
+    var vFrom = skip && from > pinStart ? from - skip : from, vTo = skip && to > pinStart ? to - skip : to;
+    var dist = Math.abs(vTo - vFrom), dur = Math.min(1100, Math.max(550, 450 + dist * 0.25));
+    var go = function (y) { window.scrollTo({ top: y, behavior: 'instant' }); };   /* the smooth-scroll helper follows along by itself */
+    var t0 = performance.now();
     (function step(now) {
-      var k = Math.min(1, Math.max(0, (now - t0) / dur)), ease = 1 - Math.pow(1 - k, 3);
-      window.scrollTo({ top: from + (to - from) * ease, behavior: 'instant' });
+      var k = Math.min(1, Math.max(0, (now - t0) / dur));
+      var ease = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;   /* gentle start, gentle stop */
+      go(Math.round(real(vFrom + (vTo - vFrom) * ease)));
       if (k < 1) raf = requestAnimationFrame(step); else finish(true);
     })(t0);
   });

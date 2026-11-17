@@ -270,6 +270,7 @@ address{font-size:16px;opacity:.95}
 /* ---- Lenis smooth scroll ---- */
 html.lenis,html.lenis body{height:auto}
 .lenis.lenis-smooth{scroll-behavior:auto!important}
+html.lenis{scroll-behavior:auto!important}   /* Lenis already smooths scrolling; the browser's own smooth scroll on top made jumps lag */
 .lenis.lenis-smooth [data-lenis-prevent]{overscroll-behavior:contain}
 .lenis.lenis-stopped{overflow:hidden}
 
