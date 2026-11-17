@@ -43,6 +43,7 @@
     if (img.tagName === 'IMG' && img.dataset.fallback) {
       var wrap = img.parentNode;
       wrap.innerHTML = wrap.id === 'farmPhoto' ? farmArt : melonArt;
+      if (wrap.id === 'farmPhoto') { lastFarm = ''; if (window.requestAnimationFrame) requestAnimationFrame(onScroll); }
     }
   }, true);
 
@@ -376,7 +377,8 @@
     if (y < 200) { if (!navReset) { navReset = true; nav.querySelectorAll('a').forEach(function (a) { a.setAttribute('aria-current', 'false'); }); moveInd(); } }
     else navReset = false;
 
-    if (phone) {
+    if (jumping) { /* a menu/button jump is gliding past: leave the melon as it is (set when the jump started), no split animation */ }
+    else if (phone) {
       /* phones: no pinning — the melon opens and the points light up as the section scrolls past */
       if (!cut.classList.contains('live')) cut.classList.add('live');
       /* starts opening as soon as the melon peeks in, fully open by the time it reaches the middle of the screen */
@@ -402,25 +404,58 @@
     }
   }
   /* in-page links: one short eased scroll (about 0.6s) instead of the browser's long smooth scroll across the tall pinned section; animations pause meanwhile so it stays smooth */
-  var root = document.documentElement, jumping = false;
+  var root = document.documentElement, jumping = false, endJump = null;
+  function targetY(t, id) {
+    var pad = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
+    var max = Math.max(0, root.scrollHeight - window.innerHeight);
+    return Math.min(max, Math.max(0, Math.round(t.getBoundingClientRect().top + window.scrollY - (id === 'top' ? 0 : pad))));
+  }
   document.addEventListener('click', function (e) {
     var a = e.target.closest && e.target.closest('a[href^="#"]');
-    if (!a || a.id === 'dOrder' || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!a || a.id === 'dOrder' || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     var id = a.getAttribute('href').slice(1), t = id ? document.getElementById(id) : null;
-    if (!t || jumping) return;
-    e.preventDefault();
-    var pad = parseFloat(getComputedStyle(root).scrollPaddingTop) || 0;
-    var from = window.scrollY, to = Math.max(0, Math.round(t.getBoundingClientRect().top + from - (id === 'top' ? 0 : pad)));
+    if (!t || t.hidden) return;
+    e.preventDefault();                        /* always, so a second quick tap can't start the browser's own jump on top of ours */
+    if (jumping && endJump) endJump(false);    /* a new tap during a jump: stop the old one and go to the new place */
+    var from = window.scrollY, to = targetY(t, id);
     try { history.replaceState(null, '', '#' + id); } catch (_) {}
     if (reduce || Math.abs(to - from) < 4) { window.scrollTo({ top: to, behavior: 'instant' }); return; }
     jumping = true; root.classList.add('is-jumping');
-    var fin = function () { jumping = false; root.classList.remove('is-jumping'); };
-    if (window.__lenis) { window.__lenis.scrollTo(to, { duration: 1.1, onComplete: fin }); return; }
+    /* skip the "from our farm to your hands" melon animation: put the melon straight into the state it has at the destination */
+    var vw = window.innerWidth;
+    if (!staticCut() || vw <= 860) {
+      var cutTop = cut.getBoundingClientRect().top + from;
+      setCut(to > cutTop ? (vw <= 860 ? (vw <= 600 ? 0.45 : 0.7) : 1) : 0, vw <= 860);
+    }
+    var raf = 0, guard = 0, done = false;
+    function stopOnUser() { finish(false); }
+    var userEvents = ['wheel', 'touchstart', 'keydown', 'mousedown'];
+    function finish(arrived) {
+      if (done) return; done = true;
+      cancelAnimationFrame(raf); clearTimeout(guard);
+      userEvents.forEach(function (ev) { window.removeEventListener(ev, stopOnUser, true); });
+      if (endJump === finish) { jumping = false; endJump = null; root.classList.remove('is-jumping'); }
+      if (arrived) {
+        /* if something above changed height during the jump (e.g. gallery photos finished loading), land exactly on the section anyway */
+        var fix = targetY(t, id);
+        if (Math.abs(fix - window.scrollY) > 2) {
+          if (window.__lenis) window.__lenis.scrollTo(fix, { immediate: true, force: true });
+          else window.scrollTo({ top: fix, behavior: 'instant' });
+        }
+      }
+      onScroll();
+    }
+    endJump = finish;
+    /* the person scrolls or taps during the jump: let them take over (our own loop would otherwise fight their finger) */
+    userEvents.forEach(function (ev) { window.addEventListener(ev, stopOnUser, { capture: true, passive: true }); });
+    /* safety net: whatever happens (interrupted, a dialog stopped the scroller…), never leave the page frozen */
+    guard = setTimeout(function () { finish(true); }, 2000);
+    if (window.__lenis) { window.__lenis.scrollTo(to, { duration: 1.1, force: true, onComplete: function () { finish(true); } }); return; }
     var t0 = performance.now(), dur = 650;
     (function step(now) {
-      var k = Math.min(1, (now - t0) / dur), ease = 1 - Math.pow(1 - k, 3);
+      var k = Math.min(1, Math.max(0, (now - t0) / dur)), ease = 1 - Math.pow(1 - k, 3);
       window.scrollTo({ top: from + (to - from) * ease, behavior: 'instant' });
-      if (k < 1) requestAnimationFrame(step); else fin();
+      if (k < 1) raf = requestAnimationFrame(step); else finish(true);
     })(t0);
   });
 
